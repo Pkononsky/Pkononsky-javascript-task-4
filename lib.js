@@ -36,8 +36,8 @@ function bypassFriendsGraph(friends, filter, maxLevel = -1) {
     let currentLevel = 0;
     while (friendsToCheck.length !== 0 && currentLevel !== maxLevel) {
         currentLevel++;
-        let suitableFriendsName = friendsToCheck.filter((friend) => {
-            let friendObj = getFriendObjectByName(friends, friend);
+        let suitableFriendsName = friendsToCheck.filter((friendName) => {
+            let friendObj = getFriendObjectByName(friends, friendName);
 
             return filter.isSuitable(friendObj);
         }).sort();
@@ -50,7 +50,6 @@ function bypassFriendsGraph(friends, filter, maxLevel = -1) {
 
     return suitableFriends;
 }
-
 
 /**
  * Итератор по друзьям
@@ -127,9 +126,9 @@ function FemaleFilter() {
     };
 }
 
-LimitedIterator.prototype = Iterator.prototype;
-MaleFilter.prototype = Filter.prototype;
-FemaleFilter.prototype = Filter.prototype;
+Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
+Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
+Object.setPrototypeOf(FemaleFilter.prototype, Filter.prototype);
 
 exports.Iterator = Iterator;
 exports.LimitedIterator = LimitedIterator;
