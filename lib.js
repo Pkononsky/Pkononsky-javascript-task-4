@@ -87,9 +87,6 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    if (!(filter instanceof Filter)) {
-        throw new TypeError(TYPE_ERROR_TEXT);
-    }
     this.suitableFriends = bypassFriendsGraph(friends, filter, maxLevel);
     this.isDone = this.suitableFriends.length === 0;
 }
