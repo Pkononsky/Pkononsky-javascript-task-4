@@ -22,20 +22,19 @@ function getNextFriendToCheck(friends, friendsToCheck, visitedFriends) {
     return nextFriends;
 }
 
-function bypassFriendsGraph(friends, filter, maxLevel = -1) {
+function bypassFriendsGraph(friends, filter, maxLevel = Infinity) {
     const bestFriends = getBestFriends(friends);
     let visitedFriends = [...bestFriends];
     let friendsToCheck = [...bestFriends];
     let suitableFriends = [];
-    let currentLevel = 0;
-    while (friendsToCheck.length !== 0 && currentLevel !== maxLevel) {
-        currentLevel++;
+    while (friendsToCheck.length !== 0 && maxLevel > 0) {
         friendsToCheck.sort();
         suitableFriends.push(...friendsToCheck.map((friendName) => {
             return getFriendObjectByName(friends, friendName);
         }));
         friendsToCheck = getNextFriendToCheck(friends, friendsToCheck, visitedFriends);
         visitedFriends.push(...friendsToCheck);
+        maxLevel--;
     }
 
     return suitableFriends.filter(filter.isSuitable);
