@@ -63,18 +63,19 @@ function Iterator(friends, filter) {
         throw new TypeError(TYPE_ERROR_TEXT);
     }
     this.suitableFriends = bypassFriendsGraph(friends, filter);
-    this.idDone = this.suitableFriends.length === 0;
+    this.isDone = this.suitableFriends.length === 0;
 }
 
 Iterator.prototype = {
     next: function () {
         let friend = this.suitableFriends.shift();
-        this.idDone = this.suitableFriends.length === 0;
+        friend = friend === undefined ? null : friend;
+        this.isDone = this.suitableFriends.length === 0;
 
         return friend;
     },
     done: function () {
-        return this.idDone;
+        return this.isDone;
     }
 };
 
@@ -91,7 +92,7 @@ function LimitedIterator(friends, filter, maxLevel) {
         throw new TypeError(TYPE_ERROR_TEXT);
     }
     this.suitableFriends = bypassFriendsGraph(friends, filter, maxLevel);
-    this.idDone = this.suitableFriends.length === 0;
+    this.isDone = this.suitableFriends.length === 0;
 }
 
 /**
