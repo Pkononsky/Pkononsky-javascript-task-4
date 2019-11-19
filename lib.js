@@ -21,7 +21,7 @@ function getNextFriendToCheck(friends, friendsToCheck, visitedFriends) {
     for (let friend of friendsToCheck) {
         let friendObj = getFriendObjectByName(friends, friend);
         nextFriends.push(...friendObj.friends.filter((nextFriend) => {
-            return !visitedFriends.includes(nextFriend);
+            return !visitedFriends.includes(nextFriend) && !nextFriends.includes(nextFriend);
         }));
     }
 
@@ -31,10 +31,10 @@ function getNextFriendToCheck(friends, friendsToCheck, visitedFriends) {
 function* bypassFriendsGraph(friends, filter, maxLevel = -1) {
     const bestFriends = getBestFriends(friends);
 
-    let visitedFriends = [];
+    let visitedFriends = [...bestFriends];
     let friendsToCheck = [...bestFriends];
     let currentLevel = 0;
-    while (visitedFriends.length !== friends.length && currentLevel !== maxLevel) {
+    while (friendsToCheck.length !== 0 && currentLevel !== maxLevel) {
         currentLevel++;
         let suitableFriendsName = friendsToCheck.filter((friend) => {
             let friendObj = getFriendObjectByName(friends, friend);
@@ -47,8 +47,8 @@ function* bypassFriendsGraph(friends, filter, maxLevel = -1) {
         while (suitableFriends.length !== 0) {
             yield suitableFriends.shift();
         }
-        visitedFriends.push(...friendsToCheck);
         friendsToCheck = getNextFriendToCheck(friends, friendsToCheck, visitedFriends);
+        visitedFriends.push(...friendsToCheck);
     }
 }
 
