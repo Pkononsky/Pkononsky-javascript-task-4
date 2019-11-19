@@ -3,17 +3,11 @@
 const TYPE_ERROR_TEXT = '"filter" is not a Filter heir';
 
 function getFriendObjectByName(friends, friendName) {
-    return friends.find((friend) => {
-        return friend.name === friendName;
-    });
+    return friends.find((friend) => friend.name === friendName);
 }
 
 function getBestFriends(friends) {
-    return friends.filter((friend) => {
-        return friend.best;
-    }).map((friend) => {
-        return friend.name;
-    });
+    return friends.filter((friend) => friend.best).map((friend) => friend.name);
 }
 
 function getNextFriendToCheck(friends, friendsToCheck, visitedFriends) {
@@ -36,19 +30,15 @@ function bypassFriendsGraph(friends, filter, maxLevel = -1) {
     let currentLevel = 0;
     while (friendsToCheck.length !== 0 && currentLevel !== maxLevel) {
         currentLevel++;
-        let suitableFriendsName = friendsToCheck.filter((friendName) => {
-            let friendObj = getFriendObjectByName(friends, friendName);
-
-            return filter.isSuitable(friendObj);
-        }).sort();
-        suitableFriends.push(...suitableFriendsName.map((friendName) => {
+        friendsToCheck.sort();
+        suitableFriends.push(...friendsToCheck.map((friendName) => {
             return getFriendObjectByName(friends, friendName);
         }));
         friendsToCheck = getNextFriendToCheck(friends, friendsToCheck, visitedFriends);
         visitedFriends.push(...friendsToCheck);
     }
 
-    return suitableFriends;
+    return suitableFriends.filter(filter.isSuitable);
 }
 
 /**
