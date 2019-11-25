@@ -2,18 +2,18 @@
 
 const TYPE_ERROR_TEXT = '"filter" is not a Filter heir';
 
-function getFriendObjectByName(friends, friendName) {
+function getFriendByName(friends, friendName) {
     return friends.find((friend) => friend.name === friendName);
 }
 
-function getBestFriends(friends) {
+function getBestFriendsNames(friends) {
     return friends.filter((friend) => friend.best).map((friend) => friend.name);
 }
 
 function getNextFriendToCheck(friends, currentFriends, visitedFriends) {
     let nextFriends = [];
     for (let friend of currentFriends) {
-        let friendObj = getFriendObjectByName(friends, friend);
+        let friendObj = getFriendByName(friends, friend);
         nextFriends.push(...friendObj.friends.filter((nextFriend) => {
             return !visitedFriends.includes(nextFriend) && !nextFriends.includes(nextFriend);
         }));
@@ -22,15 +22,15 @@ function getNextFriendToCheck(friends, currentFriends, visitedFriends) {
     return nextFriends;
 }
 
-function bypassFriendsGraph(friends, filter, maxLevel = Infinity) {
-    const bestFriends = getBestFriends(friends);
+function getSuitableFriends(friends, filter, maxLevel = Infinity) {
+    const bestFriends = getBestFriendsNames(friends);
     let visitedFriends = [...bestFriends];
     let currentFriends = [...bestFriends];
     let suitableFriends = [];
     while (currentFriends.length !== 0 && maxLevel > 0) {
         currentFriends.sort();
         suitableFriends.push(...currentFriends.map((friendName) => {
-            return getFriendObjectByName(friends, friendName);
+            return getFriendByName(friends, friendName);
         }));
         currentFriends = getNextFriendToCheck(friends, currentFriends, visitedFriends);
         visitedFriends.push(...currentFriends);
@@ -50,7 +50,7 @@ function Iterator(friends, filter) {
     if (!(filter instanceof Filter)) {
         throw new TypeError(TYPE_ERROR_TEXT);
     }
-    this.suitableFriends = bypassFriendsGraph(friends, filter);
+    this.suitableFriends = getSuitableFriends(friends, filter);
     this.isDone = this.suitableFriends.length === 0;
 }
 
@@ -76,7 +76,7 @@ Iterator.prototype = {
  * @param {Number} maxLevel – максимальный круг друзей
  */
 function LimitedIterator(friends, filter, maxLevel) {
-    this.suitableFriends = bypassFriendsGraph(friends, filter, maxLevel);
+    this.suitableFriends = getSuitableFriends(friends, filter, maxLevel);
     this.isDone = this.suitableFriends.length === 0;
 }
 
@@ -85,10 +85,12 @@ function LimitedIterator(friends, filter, maxLevel) {
  * @constructor
  */
 function Filter() {
-    this.isSuitable = function () {
-        return true;
-    };
+
 }
+
+Filter.prototype.isSuitable = function () {
+    return true;
+};
 
 /**
  * Фильтр друзей
@@ -96,10 +98,12 @@ function Filter() {
  * @constructor
  */
 function MaleFilter() {
-    this.isSuitable = function (friend) {
-        return friend.gender === 'male';
-    };
+
 }
+
+MaleFilter.prototype.isSuitable = function (friend) {
+    return friend.gender === 'male';
+};
 
 /**
  * Фильтр друзей-девушек
@@ -107,10 +111,13 @@ function MaleFilter() {
  * @constructor
  */
 function FemaleFilter() {
-    this.isSuitable = function (friend) {
-        return friend.gender === 'female';
-    };
+
 }
+
+FemaleFilter.prototype.isSuitable = function (friend) {
+    return friend.gender === 'female';
+};
+
 
 Object.setPrototypeOf(LimitedIterator.prototype, Iterator.prototype);
 Object.setPrototypeOf(MaleFilter.prototype, Filter.prototype);
