@@ -10,34 +10,31 @@ function getBestFriendsNames(friends) {
     return friends.filter((friend) => friend.best).map((friend) => friend.name);
 }
 
-function getNextFriendToCheck(friends, currentFriends, visitedFriends) {
-    let nextFriends = [];
-    for (let friend of currentFriends) {
-        let friendObj = getFriendByName(friends, friend);
-        nextFriends.push(...friendObj.friends.filter((nextFriend) => {
-            return !visitedFriends.includes(nextFriend) && !nextFriends.includes(nextFriend);
-        }));
-    }
+function getNextFriend(friends, currentFriends, suitableFriends) {
+    let nextFriends = currentFriends.reduce((prev, friend) => {
+        return [...prev, ...getFriendByName(friends, friend).friends];
+    }, []);
+    nextFriends = [...new Set(nextFriends)].filter((nextFriend) => {
+        return !suitableFriends.includes(nextFriend);
+    });
 
     return nextFriends;
 }
 
 function getSuitableFriends(friends, filter, maxLevel = Infinity) {
     const bestFriends = getBestFriendsNames(friends);
-    let visitedFriends = [...bestFriends];
     let currentFriends = [...bestFriends];
     let suitableFriends = [];
     while (currentFriends.length !== 0 && maxLevel > 0) {
         currentFriends.sort();
-        suitableFriends.push(...currentFriends.map((friendName) => {
-            return getFriendByName(friends, friendName);
-        }));
-        currentFriends = getNextFriendToCheck(friends, currentFriends, visitedFriends);
-        visitedFriends.push(...currentFriends);
+        suitableFriends.push(...currentFriends);
+        currentFriends = getNextFriend(friends, currentFriends, suitableFriends);
         maxLevel--;
     }
 
-    return suitableFriends.filter(filter.isSuitable);
+    return suitableFriends.map((friendName) => {
+        return getFriendByName(friends, friendName);
+    }).filter(filter.isSuitable);
 }
 
 /**
